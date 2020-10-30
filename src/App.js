@@ -21,7 +21,20 @@ export default function App() {
   }, [])
   
   async function handleLikeRepository(id) {
-    // Implement "Like Repository" functionality
+    const response = await api.post(`/repositories/${id}/like`)
+
+    const likedRepo = response.data;
+
+    const repoUpdated = respositories.map(repo => {
+      if (repo.id === id) {
+        return likedRepo;
+      }
+
+      return repo;
+    })
+    
+
+    setRepositories(repoUpdated);
   }
 
   return (
@@ -32,13 +45,13 @@ export default function App() {
           style={styles.repositoryContainer}
           data={respositories}
           keyExtractor={repo => repo.id}
-          renderItem={({item}) => (
+          renderItem={({item: repository}) => (
           <View>
-            <Text style={styles.repository}>{item.title}</Text>
+            <Text style={styles.repository}>{repository.title}</Text>
 
             <View style={styles.techsContainer}>
-              {item.techs.map(tech => (
-              <Text style={styles.tech}>
+              {repository.techs.map(tech => (
+              <Text key={tech} style={styles.tech}>
                 {tech}
               </Text>
               ))}
@@ -47,18 +60,16 @@ export default function App() {
             <View style={styles.likesContainer}>
               <Text
                 style={styles.likeText}
-                // Remember to replace "1" below with repository ID: {`repository-likes-${repository.id}`}
-                testID={`repository-likes-1`}
+                testID={`repository-likes-${repository.id}`}
               >
-                3 curtidas
+                {`${repository.likes} curtidas`}
               </Text>
             </View>
 
             <TouchableOpacity
               style={styles.button}
-              onPress={() => handleLikeRepository(1)}
-              // Remember to replace "1" below with repository ID: {`like-button-${repository.id}`}
-              testID={`like-button-1`}
+              onPress={() => handleLikeRepository(repository.id)}
+              testID={`like-button-${repository.id}`}
             >
               <Text style={styles.buttonText}>Curtir</Text>
             </TouchableOpacity>
